@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>絶対に押すな - 最強・崩壊編</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #111;
+      color: #fff;
+      font-family: 'Reggae One', sans-serif;
+      text-align: center;
+      overflow: hidden;
+      user-select: none;
+      transition: all 0.1s;
+    }
+
+    #message {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      height: 3rem;
+      color: #f1c40f;
+      text-shadow: 2px 2px 0 #000;
+      z-index: 50;
+    }
+
+    .btn {
+      padding: 20px 40px;
+      font-size: 1.8rem;
+      color: #fff;
+      background-color: #e74c3c;
+      border: 3px solid #c0392b;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px #8b0000;
+      position: relative;
+      z-index: 10;
+      font-family: 'Reggae One', sans-serif;
+      transition: transform 0.1s;
+    }
+    .btn:active {
+      box-shadow: 0 2px #8b0000;
+      transform: translateY(6px);
+    }
+
+    /* 増殖ボタン */
+    .clone-btn {
+      position: absolute;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #ff4500;
+      animation: popClone 0.3s forwards;
+    }
+    @keyframes popClone {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+
+    /* 各フェーズの共通コンテナ */
+    #attack-image-container, #paa-container, #noise-container, #alert-container {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      display: none; justify-content: center; align-items: center; flex-direction: column;
+      cursor: pointer; z-index: 100;
+    }
+
+    /* 襲来画像 */
+    #attack-image-container { background-color: #000; }
+    #attack-image-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    /* 高速回転パァ */
+    #paa-container { background-color: #ff1493; }
+    .paa-text {
+      font-size: 10rem; color: #fff; text-shadow: 5px 5px 0px #000;
+      animation: spinCrazy 0.2s linear infinite;
+    }
+    @keyframes spinCrazy { 100% { transform: rotate(360deg) scale(1.5); } }
+
+    /* 砂嵐 */
+    #noise-container { background-color: #000; z-index: 300; }
+    #static-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.9; }
+
+    /* 最終崩壊アラート */
+    #alert-container { background: red; z-index: 400; overflow: hidden; }
+    .alert-title { font-size: 6rem; color: yellow; text-shadow: 0 0 20px #000; animation: blinkFast 0.1s infinite; }
+    
+    /* フェイクエラーポップアップ */
+    .fake-error {
+      position: absolute;
+      background: #ece9d8;
+      border: 2px solid #0055ea;
+      color: #000;
+      font-family: 'MS PGothic', sans-serif;
+      box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+      padding: 0;
+      width: 300px;
+      z-index: 500;
+    }
+    .fake-error-header { background: #0055ea; color: white; padding: 5px; font-weight: bold; font-size: 14px; text-align: left;}
+    .fake-error-body { padding: 20px; font-size: 16px; display: flex; align-items: center; gap: 10px;}
+    .fake-error-btn { margin: 10px; padding: 5px 20px; cursor: pointer; }
+
+    /* 画面全体崩壊エフェクト */
+    .screen-collapse {
+      animation: collapse 0.1s infinite !important;
+      filter: invert(1) hue-rotate(90deg);
+    }
+
+    @keyframes blinkFast { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes collapse {
+      0% { transform: translate(10px, -10px) rotate(2deg); background-color: red;}
+      50% { transform: translate(-10px, 10px) rotate(-2deg); background-color: black;}
+      100% { transform: translate(10px, 10px) rotate(1deg); background-color: yellow;}
+    }
+  </style>
+</head>
+<body>
+
+  <div id="message">絶対にこのボタンを押さないでください。</div>
+  <button class="btn" id="jokeBtn" onclick="nextStage()">押すな</button>
+
+  <div id="attack-image-container" onclick="nextStage()">
+    <img src="shurai.png" alt="何かかが襲来" onerror="this.src='shurai.jpg'">
+  </div>
+
+  <div id="paa-container" onclick="nextStage()">
+    <div class="paa-text">( ᐛ👐)パァ</div>
+  </div>
+
+  <div id="noise-container" onclick="nextStage()">
+    <canvas id="static-canvas"></canvas>
+    <div style="position:relative; z-index:301; font-size:3rem; color:red; text-shadow:2px 2px #000;">ｼﾞｼﾞｼﾞ… (タップ)</div>
+  </div>
+
+  <div id="alert-container" onclick="location.reload()">
+    <div class="alert-title">CRITICAL ERROR</div>
+    <div style="font-size:2rem; margin-top:20px; color:#fff;">[ 画面タップで強制再起動 ]</div>
+  </div>
+
+  <script>
+    const messages = [
+      "だから押すなと言ったでしょう！",
+      "次押したら本当に何かが起きますよ？",
+      "しつこいですね。",
+      "（ボタンが逃げ出そうとしている…）",
+      "増殖開始まで 3",
+      "2",
+      "1"
+    ];
+
+    let count = 0;
+    const dodgePhase = 3;   // ボタンが逃げ始める
+    const clonePhase = 7;   // ボタンが増殖し始める
+    const attackCount = 15; // 襲来画像
+    const paaCount = 16;    // パァ
+    const noiseCount = 17;  // 砂嵐（音＋映像）
+    const alertCount = 18;  // 最終崩壊
+
+    const btnElem = document.getElementById("jokeBtn");
+    const msgElem = document.getElementById("message");
+    let audioCtx = null;
+    let noiseNode = null;
+    let errorInterval = null;
+
+    // 音声機能の初期化・ブロック解除
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // ボタンが逃げる処理
+    btnElem.addEventListener('mouseover', () => {
+      if (count >= dodgePhase && count < clonePhase) {
+        btnElem.style.position = 'absolute';
+        btnElem.style.left = Math.random() * (window.innerWidth - 150) + 'px';
+        btnElem.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+      }
+    });
+
+    function nextStage() {
+      initAudio(); // 画面操作時に音声をON
+      count++;
+
+      // メッセージ更新
+      if (count < messages.length) {
+        msgElem.innerText = messages[count];
+      } else if (count < attackCount) {
+        msgElem.innerText = "押せ押せ押せ押せ！！！";
+        msgElem.style.color = "red";
+      }
+
+      // 増殖フェーズ
+      if (count >= clonePhase && count < attackCount) {
+        btnElem.style.position = 'absolute';
+        for(let i=0; i<3; i++) spawnCloneButton();
+      }
+
+      // 各フェーズの切り替え
+      if (count === attackCount) {
+        document.querySelectorAll('.clone-btn').forEach(e => e.remove());
+        document.getElementById("attack-image-container").style.display = 'flex';
+      }
+      if (count === paaCount) {
+        document.getElementById("attack-image-container").style.display = 'none';
+        document.getElementById("paa-container").style.display = 'flex';
+      }
+      if (count === noiseCount) {
+        document.getElementById("paa-container").style.display = 'none';
+        document.getElementById("noise-container").style.display = 'flex';
+        startNoise();
+      }
+      if (count >= alertCount) {
+        stopNoise();
+        document.getElementById("noise-container").style.display = 'none';
+        triggerUltimateCollapse();
+      }
+    }
+
+    // ボタン増殖関数
+    function spawnCloneButton() {
+      const btn = document.createElement('button');
+      btn.innerText = "押すな";
+      btn.className = "btn clone-btn";
+      btn.style.left = Math.random() * (window.innerWidth - 100) + 'px';
+      btn.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+      btn.onclick = nextStage;
+      document.body.appendChild(btn);
+    }
+
+    // 砂嵐（映像とノイズ音）
+    function startNoise() {
+      initAudio();
+
+      const canvas = document.getElementById('static-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth / 2;
+      canvas.height = window.innerHeight / 2;
+
+      function renderNoise() {
+        const imgData = ctx.createImageData(canvas.width, canvas.height);
+        const buffer = new Uint32Array(imgData.data.buffer);
+        for (let i = 0; i < buffer.length; i++) buffer[i] = Math.random() < 0.5 ? 0xff000000 : 0xffffffff;
+        ctx.putImageData(imgData, 0, 0);
+        if (count === noiseCount) requestAnimationFrame(renderNoise);
+      }
+      renderNoise();
+
+      // 「ｼﾞｼﾞｼﾞ…」ホワイトノイズ生成
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = noiseBuffer;
+      noiseNode.loop = true;
+
+      const gainNode = audioCtx.createGain();
+      gainNode.gain.value = 0.2;
+
+      noiseNode.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      noiseNode.start();
+    }
+
+    function stopNoise() {
+      if (noiseNode) {
+        try { noiseNode.stop(); } catch(e){}
+        noiseNode = null;
+      }
+    }
+
+    // 最終崩壊処理（画面揺れ＋不協和音サイレン）
+    function triggerUltimateCollapse() {
+      initAudio();
+      document.body.classList.add('screen-collapse');
+      document.getElementById("alert-container").style.display = 'flex';
+
+      setInterval(() => {
+        if (!audioCtx) return;
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        
+        osc1.type = 'sawtooth';
+        osc2.type = 'square';
+        
+        osc1.frequency.value = Math.random() * 1000 + 200;
+        osc2.frequency.value = osc1.frequency.value + 30;
+
+        gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc1.start(); osc2.start();
+        osc1.stop(audioCtx.currentTime + 0.1);
+        osc2.stop(audioCtx.currentTime + 0.1);
+      }, 80);
+
+      errorInterval = setInterval(createFakeError, 200);
+    }
+
+    // Windows XP風フェイクエラー生成
+    function createFakeError() {
+      if(document.querySelectorAll('.fake-error').length > 50) return;
+
+      const errDiv = document.createElement('div');
+      errDiv.className = 'fake-error';
+      errDiv.style.left = Math.random() * (window.innerWidth - 300) + 'px';
+      errDiv.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+      
+      errDiv.innerHTML = `
+        <div class="fake-error-header">System Error</div>
+        <div class="fake-error-body">
+          <span style="font-size:30px; color:red;">❌</span>
+          <div>致命的なエラーが発生しました。<br>システムが崩壊しています。</div>
+        </div>
+        <div style="text-align:center;">
+          <button class="fake-error-btn">OK</button>
+        </div>
+      `;
+      document.getElementById("alert-container").appendChild(errDiv);
+    }
+  </script>
+</body>
+</html>
