@@ -2,16 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>絶対に押すな - 最強・崩壊編</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Reggae+One&display=swap" rel="stylesheet">
   
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent; /* タップ時の青枠を消す */
+    }
+
     body {
       margin: 0;
       height: 100vh;
+      height: 100dvh; /* スマホのアドレスバー対策 */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -22,21 +29,24 @@
       text-align: center;
       overflow: hidden;
       user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation; /* ダブルタップ拡大防止 */
       transition: all 0.1s;
     }
 
     #message {
-      font-size: 2rem;
+      font-size: clamp(1.2rem, 5vw, 2rem);
       margin-bottom: 2rem;
-      height: 3rem;
+      padding: 0 10px;
+      min-height: 3rem;
       color: #f1c40f;
       text-shadow: 2px 2px 0 #000;
       z-index: 50;
     }
 
     .btn {
-      padding: 20px 40px;
-      font-size: 1.8rem;
+      padding: 18px 36px;
+      font-size: clamp(1.3rem, 5vw, 1.8rem);
       color: #fff;
       background-color: #e74c3c;
       border: 3px solid #c0392b;
@@ -56,8 +66,8 @@
     /* 増殖ボタン */
     .clone-btn {
       position: absolute;
-      padding: 10px 20px;
-      font-size: 1rem;
+      padding: 10px 18px;
+      font-size: clamp(0.9rem, 3.5vw, 1.2rem);
       background-color: #ff4500;
       animation: popClone 0.3s forwards;
     }
@@ -66,10 +76,10 @@
       100% { transform: scale(1); }
     }
 
-    /* 各フェーズの共通コンテナ */
+    /* コンテナ共通 */
     #attack-image-container, #paa-container, #noise-container, #alert-container {
       position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
+      top: 0; left: 0; width: 100vw; height: 100dvh;
       display: none; justify-content: center; align-items: center; flex-direction: column;
       cursor: pointer; z-index: 100;
     }
@@ -81,10 +91,11 @@
     /* 高速回転パァ */
     #paa-container { background-color: #ff1493; }
     .paa-text {
-      font-size: 10rem; color: #fff; text-shadow: 5px 5px 0px #000;
+      font-size: clamp(4rem, 20vw, 10rem);
+      color: #fff; text-shadow: 5px 5px 0px #000;
       animation: spinCrazy 0.2s linear infinite;
     }
-    @keyframes spinCrazy { 100% { transform: rotate(360deg) scale(1.5); } }
+    @keyframes spinCrazy { 100% { transform: rotate(360deg) scale(1.3); } }
 
     /* 砂嵐 */
     #noise-container { background-color: #000; z-index: 300; }
@@ -92,9 +103,15 @@
 
     /* 最終崩壊アラート */
     #alert-container { background: red; z-index: 400; overflow: hidden; }
-    .alert-title { font-size: 6rem; color: yellow; text-shadow: 0 0 20px #000; animation: blinkFast 0.1s infinite; }
+    .alert-title {
+      font-size: clamp(2.5rem, 12vw, 6rem);
+      color: yellow;
+      text-shadow: 0 0 20px #000;
+      animation: blinkFast 0.1s infinite;
+      word-break: break-word;
+    }
     
-    /* フェイクエラーポップアップ */
+    /* フェイクエラーポップアップ（スマホ表示調整） */
     .fake-error {
       position: absolute;
       background: #ece9d8;
@@ -103,12 +120,12 @@
       font-family: 'MS PGothic', sans-serif;
       box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
       padding: 0;
-      width: 300px;
+      width: min(280px, 75vw);
       z-index: 500;
     }
-    .fake-error-header { background: #0055ea; color: white; padding: 5px; font-weight: bold; font-size: 14px; text-align: left;}
-    .fake-error-body { padding: 20px; font-size: 16px; display: flex; align-items: center; gap: 10px;}
-    .fake-error-btn { margin: 10px; padding: 5px 20px; cursor: pointer; }
+    .fake-error-header { background: #0055ea; color: white; padding: 4px 8px; font-weight: bold; font-size: 12px; text-align: left;}
+    .fake-error-body { padding: 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;}
+    .fake-error-btn { margin: 8px; padding: 4px 16px; cursor: pointer; }
 
     /* 画面全体崩壊エフェクト */
     .screen-collapse {
@@ -118,9 +135,9 @@
 
     @keyframes blinkFast { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
     @keyframes collapse {
-      0% { transform: translate(10px, -10px) rotate(2deg); background-color: red;}
-      50% { transform: translate(-10px, 10px) rotate(-2deg); background-color: black;}
-      100% { transform: translate(10px, 10px) rotate(1deg); background-color: yellow;}
+      0% { transform: translate(5px, -5px) rotate(1deg); background-color: red;}
+      50% { transform: translate(-5px, 5px) rotate(-1deg); background-color: black;}
+      100% { transform: translate(5px, 5px) rotate(1deg); background-color: yellow;}
     }
   </style>
 </head>
@@ -139,12 +156,12 @@
 
   <div id="noise-container" onclick="nextStage()">
     <canvas id="static-canvas"></canvas>
-    <div style="position:relative; z-index:301; font-size:3rem; color:red; text-shadow:2px 2px #000;">ｼﾞｼﾞｼﾞ… (タップ)</div>
+    <div style="position:relative; z-index:301; font-size:clamp(1.5rem, 6vw, 3rem); color:red; text-shadow:2px 2px #000;">ｼﾞｼﾞｼﾞ… (タップ)</div>
   </div>
 
   <div id="alert-container" onclick="location.reload()">
     <div class="alert-title">CRITICAL ERROR</div>
-    <div style="font-size:2rem; margin-top:20px; color:#fff;">[ 画面タップで強制再起動 ]</div>
+    <div style="font-size:clamp(1.2rem, 5vw, 2rem); margin-top:20px; color:#fff;">[ タップで強制再起動 ]</div>
   </div>
 
   <script>
@@ -172,7 +189,7 @@
     let noiseNode = null;
     let errorInterval = null;
 
-    // 音声機能の初期化・ブロック解除
+    // 音声機能の初期化（iOS/Safari制限の解除）
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -182,14 +199,19 @@
       }
     }
 
-    // ボタンが逃げる処理
-    btnElem.addEventListener('mouseover', () => {
+    // ボタンが逃げる処理（マウスホバー & スマホタッチ両対応）
+    function handleDodge(e) {
       if (count >= dodgePhase && count < clonePhase) {
+        if (e.type === 'touchstart') e.preventDefault(); // タップしようとした瞬間に逃げる
         btnElem.style.position = 'absolute';
-        btnElem.style.left = Math.random() * (window.innerWidth - 150) + 'px';
-        btnElem.style.top = Math.random() * (window.innerHeight - 100) + 'px';
+        const maxX = window.innerWidth - btnElem.offsetWidth - 20;
+        const maxY = window.innerHeight - btnElem.offsetHeight - 20;
+        btnElem.style.left = Math.max(10, Math.random() * maxX) + 'px';
+        btnElem.style.top = Math.max(10, Math.random() * maxY) + 'px';
       }
-    });
+    }
+    btnElem.addEventListener('mouseover', handleDodge);
+    btnElem.addEventListener('touchstart', handleDodge, { passive: false });
 
     function nextStage() {
       initAudio(); // 画面操作時に音声をON
@@ -235,8 +257,10 @@
       const btn = document.createElement('button');
       btn.innerText = "押すな";
       btn.className = "btn clone-btn";
-      btn.style.left = Math.random() * (window.innerWidth - 100) + 'px';
-      btn.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+      const maxX = window.innerWidth - 100;
+      const maxY = window.innerHeight - 50;
+      btn.style.left = Math.max(10, Math.random() * maxX) + 'px';
+      btn.style.top = Math.max(10, Math.random() * maxY) + 'px';
       btn.onclick = nextStage;
       document.body.appendChild(btn);
     }
@@ -286,7 +310,7 @@
       }
     }
 
-    // 最終崩壊処理（画面揺れ＋不協和音サイレン）
+    // 最終崩壊処理（不協和音サイレン）
     function triggerUltimateCollapse() {
       initAudio();
       document.body.classList.add('screen-collapse');
@@ -319,20 +343,22 @@
       errorInterval = setInterval(createFakeError, 200);
     }
 
-    // Windows XP風フェイクエラー生成
+    // フェイクエラー生成（画面外はみ出し防止）
     function createFakeError() {
-      if(document.querySelectorAll('.fake-error').length > 50) return;
+      if(document.querySelectorAll('.fake-error').length > 40) return;
 
       const errDiv = document.createElement('div');
       errDiv.className = 'fake-error';
-      errDiv.style.left = Math.random() * (window.innerWidth - 300) + 'px';
-      errDiv.style.top = Math.random() * (window.innerHeight - 150) + 'px';
+      const maxX = window.innerWidth - 220;
+      const maxY = window.innerHeight - 120;
+      errDiv.style.left = Math.max(10, Math.random() * maxX) + 'px';
+      errDiv.style.top = Math.max(10, Math.random() * maxY) + 'px';
       
       errDiv.innerHTML = `
         <div class="fake-error-header">System Error</div>
         <div class="fake-error-body">
-          <span style="font-size:30px; color:red;">❌</span>
-          <div>致命的なエラーが発生しました。<br>システムが崩壊しています。</div>
+          <span style="font-size:24px; color:red;">❌</span>
+          <div>致命的なエラー。<br>システムが崩壊中。</div>
         </div>
         <div style="text-align:center;">
           <button class="fake-error-btn">OK</button>
