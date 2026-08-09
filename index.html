@@ -77,7 +77,7 @@
     }
 
     /* コンテナ共通 */
-    #attack-image-container, #paa-container, #noise-container, #alert-container {
+    #attack-image-container, #paa-container, #daisaku-container, #noise-container, #alert-container {
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100dvh;
       display: none; justify-content: center; align-items: center; flex-direction: column;
@@ -97,6 +97,30 @@
     }
     @keyframes spinCrazy { 100% { transform: rotate(360deg) scale(1.3); } }
 
+    /* ★ ダいｻｧ~9 演出 ★ */
+    #daisaku-container { background-color: #0a0014; }
+    #daisaku-container img {
+      max-width: 80%;
+      max-height: 45vh;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    .daisaku-text {
+      font-size: clamp(3rem, 14vw, 8rem);
+      color: #00ffcc;
+      text-shadow: 4px 4px 0px #ff0055, -4px -4px 0px #000;
+      animation: daisakuGlitch 0.12s infinite;
+      word-break: break-all;
+    }
+    @keyframes daisakuGlitch {
+      0% { transform: scale(1) translate(0, 0) skewX(0deg); color: #00ffcc; }
+      20% { transform: scale(1.15) translate(-8px, 6px) skewX(12deg); color: #ff0055; }
+      40% { transform: scale(0.9) translate(8px, -6px) skewX(-12deg); color: #ffff00; }
+      60% { transform: scale(1.1) translate(-6px, -4px) skewX(6deg); color: #00ffff; }
+      80% { transform: scale(0.95) translate(6px, 4px) skewX(-6deg); color: #ff00ff; }
+      100% { transform: scale(1) translate(0, 0) skewX(0deg); color: #00ffcc; }
+    }
+
     /* 砂嵐 */
     #noise-container { background-color: #000; z-index: 300; }
     #static-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.9; }
@@ -111,7 +135,7 @@
       word-break: break-word;
     }
     
-    /* フェイクエラーポップアップ（スマホ表示調整） */
+    /* フェイクエラーポップアップ */
     .fake-error {
       position: absolute;
       background: #ece9d8;
@@ -154,6 +178,11 @@
     <div class="paa-text">( ᐛ👐)パァ</div>
   </div>
 
+  <div id="daisaku-container" onclick="nextStage()">
+    <img src="daisaku.png" alt="ダいｻｧ~9" onerror="this.src='daisaku.jpg'; this.onerror=function(){this.style.display='none';}">
+    <div class="daisaku-text">ダいｻｧ~9</div>
+  </div>
+
   <div id="noise-container" onclick="nextStage()">
     <canvas id="static-canvas"></canvas>
     <div style="position:relative; z-index:301; font-size:clamp(1.5rem, 6vw, 3rem); color:red; text-shadow:2px 2px #000;">ｼﾞｼﾞｼﾞ… (タップ)</div>
@@ -176,12 +205,13 @@
     ];
 
     let count = 0;
-    const dodgePhase = 3;   // ボタンが逃げ始める
-    const clonePhase = 7;   // ボタンが増殖し始める
-    const attackCount = 15; // 襲来画像
-    const paaCount = 16;    // パァ
-    const noiseCount = 17;  // 砂嵐（音＋映像）
-    const alertCount = 18;  // 最終崩壊
+    const dodgePhase = 3;    // ボタンが逃げ始める
+    const clonePhase = 7;    // ボタンが増殖し始める
+    const attackCount = 15;  // 襲来画像 (shurai.png)
+    const paaCount = 16;     // パァ
+    const daisakuCount = 17; // ★ ダいｻｧ~9 ★
+    const noiseCount = 18;   // 砂嵐（音＋映像）
+    const alertCount = 19;   // 最終崩壊
 
     const btnElem = document.getElementById("jokeBtn");
     const msgElem = document.getElementById("message");
@@ -202,7 +232,7 @@
     // ボタンが逃げる処理（マウスホバー & スマホタッチ両対応）
     function handleDodge(e) {
       if (count >= dodgePhase && count < clonePhase) {
-        if (e.type === 'touchstart') e.preventDefault(); // タップしようとした瞬間に逃げる
+        if (e.type === 'touchstart') e.preventDefault();
         btnElem.style.position = 'absolute';
         const maxX = window.innerWidth - btnElem.offsetWidth - 20;
         const maxY = window.innerHeight - btnElem.offsetHeight - 20;
@@ -214,7 +244,7 @@
     btnElem.addEventListener('touchstart', handleDodge, { passive: false });
 
     function nextStage() {
-      initAudio(); // 画面操作時に音声をON
+      initAudio();
       count++;
 
       // メッセージ更新
@@ -240,8 +270,12 @@
         document.getElementById("attack-image-container").style.display = 'none';
         document.getElementById("paa-container").style.display = 'flex';
       }
-      if (count === noiseCount) {
+      if (count === daisakuCount) {
         document.getElementById("paa-container").style.display = 'none';
+        document.getElementById("daisaku-container").style.display = 'flex';
+      }
+      if (count === noiseCount) {
+        document.getElementById("daisaku-container").style.display = 'none';
         document.getElementById("noise-container").style.display = 'flex';
         startNoise();
       }
@@ -283,7 +317,7 @@
       }
       renderNoise();
 
-      // 「ｼﾞｼﾞｼﾞ…」ホワイトノイズ生成
+      // ホワイトノイズ生成
       const bufferSize = audioCtx.sampleRate * 2;
       const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
@@ -310,7 +344,7 @@
       }
     }
 
-    // 最終崩壊処理（不協和音サイレン）
+    // 最終崩壊処理
     function triggerUltimateCollapse() {
       initAudio();
       document.body.classList.add('screen-collapse');
@@ -343,7 +377,7 @@
       errorInterval = setInterval(createFakeError, 200);
     }
 
-    // フェイクエラー生成（画面外はみ出し防止）
+    // フェイクエラー生成
     function createFakeError() {
       if(document.querySelectorAll('.fake-error').length > 40) return;
 
